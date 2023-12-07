@@ -3,6 +3,7 @@ project(bc7enc)
 cmake_minimum_required(VERSION 2.8)
 option(BUILD_X64 "build 64-bit" TRUE)
 option(SUPPORT_BC7E "support BC7E (requires ispc)" FALSE)
+option(COMPILE_AS_LIBRARY "compile to dll instead of exe" FALSE)
 
 message("Initial BUILD_X64=${BUILD_X64}")
 message("Initial CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
@@ -75,7 +76,6 @@ set (BC7ENC_SRC_LIST ${COMMON_SRC_LIST}
 	bc7decomp.h
 	lodepng.cpp	
 	lodepng.h
-	test.cpp
 	rgbcx.cpp
 	rgbcx.h
 	rgbcx_table4.h
@@ -91,13 +91,29 @@ set (BC7ENC_SRC_LIST ${COMMON_SRC_LIST}
 	bc7e.ispc
 	)
 
-if (NOT SUPPORT_BC7E)
-		add_executable(bc7enc ${BC7ENC_SRC_LIST})
+if (NOT COMPILE_AS_LIBRARY)
+	set (BC7ENC_SRC_LIST ${BC7ENC_SRC_LIST} test.cpp)
 else()
-	if (NOT MSVC)
-		add_executable(bc7enc ${BC7ENC_SRC_LIST} ${CMAKE_SOURCE_DIR}/bc7e.o ${CMAKE_SOURCE_DIR}/bc7e_avx.o ${CMAKE_SOURCE_DIR}/bc7e_avx2.o ${CMAKE_SOURCE_DIR}/bc7e_sse2.o ${CMAKE_SOURCE_DIR}/bc7e_sse4.o)
+	set (BC7ENC_SRC_LIST ${BC7ENC_SRC_LIST} libbc7enc.cpp libbc7enc.h)
+endif()
+
+if (NOT COMPILE_AS_LIBRARY)
+	message("Compiling as executable")
+	if (NOT SUPPORT_BC7E)
+			add_executable(bc7enc ${BC7ENC_SRC_LIST})
 	else()
-		add_executable(bc7enc ${BC7ENC_SRC_LIST} ${CMAKE_SOURCE_DIR}/bc7e.obj ${CMAKE_SOURCE_DIR}/bc7e_avx.obj ${CMAKE_SOURCE_DIR}/bc7e_avx2.obj ${CMAKE_SOURCE_DIR}/bc7e_sse2.obj ${CMAKE_SOURCE_DIR}/bc7e_sse4.obj)
+		if (NOT MSVC)
+			add_executable(bc7enc ${BC7ENC_SRC_LIST} ${CMAKE_SOURCE_DIR}/bc7e.o ${CMAKE_SOURCE_DIR}/bc7e_avx.o ${CMAKE_SOURCE_DIR}/bc7e_avx2.o ${CMAKE_SOURCE_DIR}/bc7e_sse2.o ${CMAKE_SOURCE_DIR}/bc7e_sse4.o)
+		else()
+			add_executable(bc7enc ${BC7ENC_SRC_LIST} ${CMAKE_SOURCE_DIR}/bc7e.obj ${CMAKE_SOURCE_DIR}/bc7e_avx.obj ${CMAKE_SOURCE_DIR}/bc7e_avx2.obj ${CMAKE_SOURCE_DIR}/bc7e_sse2.obj ${CMAKE_SOURCE_DIR}/bc7e_sse4.obj)
+		endif()
+	endif()
+else()
+	message("Compiling as library")
+	if (NOT MSVC)
+		add_library(bc7enc SHARED ${BC7ENC_SRC_LIST} ${CMAKE_SOURCE_DIR}/bc7e.o ${CMAKE_SOURCE_DIR}/bc7e_avx.o ${CMAKE_SOURCE_DIR}/bc7e_avx2.o ${CMAKE_SOURCE_DIR}/bc7e_sse2.o ${CMAKE_SOURCE_DIR}/bc7e_sse4.o)
+	else()
+		add_library(bc7enc SHARED ${BC7ENC_SRC_LIST} ${CMAKE_SOURCE_DIR}/bc7e.obj ${CMAKE_SOURCE_DIR}/bc7e_avx.obj ${CMAKE_SOURCE_DIR}/bc7e_avx2.obj ${CMAKE_SOURCE_DIR}/bc7e_sse2.obj ${CMAKE_SOURCE_DIR}/bc7e_sse4.obj)
 	endif()
 endif()
 

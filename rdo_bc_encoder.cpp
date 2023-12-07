@@ -541,7 +541,8 @@ namespace rdo_bc
 			int32_t image_start_block_offset = 0;
 			for (uint32_t ix = 0; ix < static_cast<int32_t>(m_source_image_mips.get_number_of_levels()); ix++)
 			{
-				printf("Encoding mip: %i\n", ix);
+				if (m_params.m_status_output)
+					printf("Encoding mip: %i\n", ix);
 				// FIXME: Avoid copy?
 				image_u8& mip_image = *m_source_image_mips.get_level(ix);
 

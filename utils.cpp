@@ -173,7 +173,7 @@ bool load_png(const char* pFilename, image_u8& img)
 	unsigned int e = lodepng::decode(pixels, w, h, pFilename);
 	if (e != 0)
 	{
-		fprintf(stderr, "Failed loading PNG file %s\n", pFilename);
+		fprintf(stderr, "Failed loading PNG file %s (%s)\n", pFilename, lodepng_error_text(e));
 		return false;
 	}
 

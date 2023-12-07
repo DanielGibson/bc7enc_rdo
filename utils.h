@@ -1822,6 +1822,14 @@ public:
 		m_pixels.resize(width * height);
 	}
 
+	// FIXME: This does a copy of the pixel data, we don't want that...
+	image_u8(uint32_t width, uint32_t height, color_quad_u8* pixels) :
+		m_width(width), m_height(height),
+		m_clip_rect(0, 0, width, height),
+		m_pixels(pixels, pixels + (width * height))
+	{
+	}
+
 	inline const color_quad_u8_vec& get_pixels() const { return m_pixels; }
 	inline color_quad_u8_vec& get_pixels() { return m_pixels; }
 
