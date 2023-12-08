@@ -1,3 +1,12 @@
 .vs/
 out/
 CMakeSettings.json
+
+*.obj
+
+# ispc files
+*_ispc.h
+*_ispc_avx.h
+*_ispc_avx2.h
+*_ispc_sse2.h
+*_ispc_sse4.h
